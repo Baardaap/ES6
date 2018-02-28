@@ -7,9 +7,27 @@
 
 #define sysfs_dir "peekpoke"
 #define sysfs_file "data"
-//#define RTC io_p2v(0x40024000)
 
 #define sysfs_max_data_size 1024
+
+//read a value from a memory adress 
+static uint32_t
+mem_read(	uint32_t adress)
+			{
+			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
+			    printk("%d\n", *adressptr);
+			    return *adressptr;
+			}
+
+//write a value to a memory adress
+static void
+mem_write(	uint32_t adress,
+			uint32_t value)
+			{
+				uint32_t *adressptr = (uint32_t*)io_p2v(adress);
+				*adressptr = value;
+				return;
+			}
 
 static char sysfs_buffer[sysfs_max_data_size+1] = "Test Message\n";
 static ssize_t used_buffer_size =0;
