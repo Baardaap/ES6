@@ -19,7 +19,7 @@ sysfs_show(	struct device *dev,
 			struct device_attribute *attr,
 			char *buffer)
 			{
-				printk(KERN_INFO "sysfile_read(/sys/kernel/%s/%s) called", sysfs_dir, sysfs_file);
+				printk(KERN_INFO "sysfile_read(/sys/kernel/%s/%s) called\n", sysfs_dir, sysfs_file);
 				return sprintf(buffer, "%s", sysfs_buffer);
 			}
 			
@@ -30,7 +30,7 @@ sysfs_store(struct device *dev,
 			size_t count)
 			{
 				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
-				printk(KERN_INFO "sysfile_write (/sys/kernel/%s/%s) called",sysfs_dir,sysfs_file);
+				printk(KERN_INFO "sysfile_write (/sys/kernel/%s/%s) called\n",sysfs_dir,sysfs_file);
 				memcpy(sysfs_buffer,buffer,used_buffer_size);
 				sysfs_buffer[used_buffer_size] = '\0';
 				return used_buffer_size;
@@ -77,8 +77,11 @@ void __exit sysfs_exit(void)
 	printk (KERN_INFO "/sys/kernel/%s/%s removed\n", sysfs_dir,sysfs_file);
 }
 
-module_init(sysfs_init)
+module_init(sysfs_init);
 module_exit(sysfs_exit);
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR(" test");
+MODULE_DESCRIPTION("blah");
 /*
 int init_module(void)
 {

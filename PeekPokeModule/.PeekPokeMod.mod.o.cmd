@@ -1,7 +1,8 @@
-cmd_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o := arm-linux-gcc -Wp,-MD,/home/student/Desktop/ES/PeekPokeModule/.PeekPokeMod.mod.o.d  -nostdinc -isystem /usr/local/xtools/arm-unknown-linux-uclibcgnueabi/lib/gcc/arm-unknown-linux-uclibcgnueabi/4.4.3/include -I/home/student/felabs/sysdev/tinysystem/linux-2.6.34/arch/arm/include -Iinclude  -include include/generated/autoconf.h -D__KERNEL__ -mlittle-endian -Iarch/arm/mach-lpc32xx/include -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -marm -fno-omit-frame-pointer -mapcs -mno-sched-prolog -mabi=aapcs-linux -mno-thumb-interwork -D__LINUX_ARM_ARCH__=5 -march=armv5te -mtune=arm9tdmi -msoft-float -Uarm -Wframe-larger-than=1024 -fno-stack-protector -fno-omit-frame-pointer -fno-optimize-sibling-calls -g -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fno-dwarf2-cfi-asm -fconserve-stack  -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(PeekPokeMod.mod)"  -D"KBUILD_MODNAME=KBUILD_STR(PeekPokeMod)"  -DMODULE -c -o /home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o /home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.c
+cmd_/home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o := arm-linux-gcc -Wp,-MD,/home/student/Desktop/ES/ES6/PeekPokeModule/.PeekPokeMod.mod.o.d  -nostdinc -isystem /usr/local/xtools/arm-unknown-linux-uclibcgnueabi/lib/gcc/arm-unknown-linux-uclibcgnueabi/4.4.3/include -I/home/student/felabs/sysdev/tinysystem/linux-2.6.34/arch/arm/include -Iinclude  -include include/generated/autoconf.h -D__KERNEL__ -mlittle-endian -Iarch/arm/mach-lpc32xx/include -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -marm -fno-omit-frame-pointer -mapcs -mno-sched-prolog -mabi=aapcs-linux -mno-thumb-interwork -D__LINUX_ARM_ARCH__=5 -march=armv5te -mtune=arm9tdmi -msoft-float -Uarm -Wframe-larger-than=1024 -fno-stack-protector -fno-omit-frame-pointer -fno-optimize-sibling-calls -g -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fno-dwarf2-cfi-asm -fconserve-stack  -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(PeekPokeMod.mod)"  -D"KBUILD_MODNAME=KBUILD_STR(PeekPokeMod)"  -DMODULE -c -o /home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o /home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.c
 
-deps_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o := \
-  /home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.c \
+deps_/home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o := \
+  /home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.c \
+    $(wildcard include/config/module/unload.h) \
   include/linux/module.h \
     $(wildcard include/config/symbol/prefix.h) \
     $(wildcard include/config/modules.h) \
@@ -14,7 +15,6 @@ deps_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o := \
     $(wildcard include/config/tracing.h) \
     $(wildcard include/config/event/tracing.h) \
     $(wildcard include/config/ftrace/mcount/record.h) \
-    $(wildcard include/config/module/unload.h) \
     $(wildcard include/config/constructors.h) \
     $(wildcard include/config/sysfs.h) \
   include/linux/list.h \
@@ -288,6 +288,6 @@ deps_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o := \
   include/linux/vermagic.h \
   include/generated/utsrelease.h \
 
-/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o: $(deps_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o)
+/home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o: $(deps_/home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o)
 
-$(deps_/home/student/Desktop/ES/PeekPokeModule/PeekPokeMod.mod.o):
+$(deps_/home/student/Desktop/ES/ES6/PeekPokeModule/PeekPokeMod.mod.o):
