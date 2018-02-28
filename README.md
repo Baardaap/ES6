@@ -1,2 +1,2 @@
 # ES6
-School assignments of the subject SD6
+School assignments of the subject SE6
