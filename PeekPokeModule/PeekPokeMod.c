@@ -25,6 +25,7 @@ peek(	uint32_t adress, uint32_t chunks, const char *buffer)
 			    printk("%d\n", *adressptr);
 				strcat(buffer, adressptr);
 			}
+			strcat(buffer, '\0');
 			return;
 		}
 
