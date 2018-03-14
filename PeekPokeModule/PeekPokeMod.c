@@ -2,6 +2,7 @@
 #include <linux/kernel.h>
 #include <linux/kobject.h>
 #include <linux/device.h>
+#include <linux/slab.h>
 
 #include <mach/hardware.h>
 
@@ -19,16 +20,18 @@ static ssize_t used_buffer_size =0;
 static void 
 peek(	uint32_t adress, uint32_t chunks)
 		{
-			char* tempbuffer[512];
+			char* tempbuffer = kmalloc(chunks*10+1, GFP_KERNEL);
 			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
 			    printk("%d\n", *adressptr);
-				strcat(tempbuffer, *adressptr);
+				char* tempstring = kmalloc(10, GFP_KERNEL);
+				snprintf(tempstring, 10, "%s", *adressptr);
+				strcat(tempbuffer, tempstring);
 			}
-			memcpy(sysfs_buffer,"tempbuffer", sysfs_max_data_size-1);
+			memcpy(sysfs_buffer,tempbuffer, sysfs_max_data_size-1);
 			sysfs_buffer[sysfs_max_data_size] = '\0';
 
 			return;
