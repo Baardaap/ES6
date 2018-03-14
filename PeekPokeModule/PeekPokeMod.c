@@ -19,18 +19,18 @@ static ssize_t used_buffer_size =0;
 static void 
 peek(	uint32_t adress, uint32_t chunks)
 		{
-			const int STR_LEN = chunks*4;
-			char str[STR_LEN];
-
+			char* tempbuffer[512];
 			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
 			    printk("%d\n", *adressptr);
-				//strcat(str,;
+				strcat(tempbuffer, *adressptr);
 			}
-			memcpy(sysfs_buffer,str,STR_LEN);
+			memcpy(sysfs_buffer,"tempbuffer", sysfs_max_data_size-1);
+			sysfs_buffer[sysfs_max_data_size] = '\0';
+
 			return;
 		}
 
@@ -84,7 +84,7 @@ sysfs_store(struct device *dev,
 				
 				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
 				//memcpy(sysfs_buffer,buffer,used_buffer_size);
-				sysfs_buffer[used_buffer_size] = '\0';
+				//sysfs_buffer[used_buffer_size] = '\0';
 
 				printk("Used buffer size: %d",used_buffer_size);
 
