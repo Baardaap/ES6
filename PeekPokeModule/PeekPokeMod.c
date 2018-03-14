@@ -61,8 +61,28 @@ sysfs_store(struct device *dev,
 			const char *buffer,
 			size_t count)
 			{
-				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
 				printk(KERN_INFO "sysfile_write (/sys/kernel/%s/%s) called\n",sysfs_dir,sysfs_file);
+
+				char command = '';
+				uint32_t adress = 0;
+				uint32_t amountOrValue = 0;
+				sscanf(buffer, "%c %u %u", command, adress, amountOrValue);
+
+				switch(command){
+					case 'r':
+						buffer = peek(adress, amountOrValue);
+					break;
+
+					case 'w':
+						poke(adress, amountOrValue);
+					break;
+
+					default:
+						printk(KERN_INFO "Command: %c is not a valid command. Try 'r' or 'w'.", command);
+					break;
+				}
+				
+				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
 				memcpy(sysfs_buffer,buffer,used_buffer_size);
 				sysfs_buffer[used_buffer_size] = '\0';
 
