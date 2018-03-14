@@ -17,7 +17,7 @@ static uint32_t
 readFromMem(	uint32_t adress)
 			{
 			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
-			    printk("%d\n", *adressptr);
+			    printk(" reading from memory %d\n", *adressptr);
 			    return *adressptr;
 			}
 
@@ -27,7 +27,7 @@ peek(	uint32_t initAdress, uint32_t chunks)
 		{
 			char *buffer;
 			int i;
-			for(i = 0; i < chunks; i++)
+			for(i = 0; i <= chunks; i++)
 			{
 				strcat(buffer,(char*) readFromMem(initAdress+i));
 			}
