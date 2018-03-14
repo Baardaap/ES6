@@ -149,21 +149,3 @@ module_exit(sysfs_exit);
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR(" test");
 MODULE_DESCRIPTION("blah");
-/*
-int init_module(void)
-{
-	int val;
-    uint32_t *a = (uint32_t*)  RTC;
-    val = *a;
-    printk("%d\n", val);
-	return 0;
-}
-
-void cleanup_module(void)
-{
-	int val;
-    uint32_t *a = (uint32_t*) RTC;
-    val = *a;
-    printk("%d\n", val);
-}
-*/
