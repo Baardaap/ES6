@@ -28,7 +28,7 @@ peek(	uint32_t adress, uint32_t chunks)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
 			    printk("%d\n", *adressptr);
-				strcat(str,(char*)adressptr);
+				//strcat(str,;
 			}
 			memcpy(sysfs_buffer,str,STR_LEN);
 			return;
