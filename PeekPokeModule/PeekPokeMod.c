@@ -70,7 +70,7 @@ sysfs_store(struct device *dev,
 				char command = ' ';
 				uint32_t adress = 0;
 				uint32_t amountOrValue = 0;
-				sscanf(buffer, "%c %u %u", &command, &adress, &amountOrValue);
+				sscanf(buffer, "%c %x %u", &command, &adress, &amountOrValue);
 
 				switch(command){
 					case 'r':
