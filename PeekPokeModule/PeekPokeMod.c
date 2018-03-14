@@ -2,9 +2,10 @@
 #include <linux/kernel.h>
 #include <linux/kobject.h>
 #include <linux/device.h>
-#include <stdio.h>
+
 #include <mach/hardware.h>
 
+#include <stdio.h>
 #include <string.h>
 
 #define sysfs_dir "peekpoke"
@@ -85,9 +86,6 @@ sysfs_store(struct device *dev,
 				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
 				memcpy(sysfs_buffer,buffer,used_buffer_size);
 				sysfs_buffer[used_buffer_size] = '\0';
-
-				
-
 				return used_buffer_size;
 			}
 
