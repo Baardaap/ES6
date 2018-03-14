@@ -1,1 +1,0 @@
-cmd_/home/student/Desktop/ES/rtcReadOut/rtcReadOutMod.ko := arm-linux-ld -EL -r  -T /home/student/felabs/sysdev/tinysystem/linux-2.6.34/scripts/module-common.lds --build-id -o /home/student/Desktop/ES/rtcReadOut/rtcReadOutMod.ko /home/student/Desktop/ES/rtcReadOut/rtcReadOutMod.o /home/student/Desktop/ES/rtcReadOut/rtcReadOutMod.mod.o
