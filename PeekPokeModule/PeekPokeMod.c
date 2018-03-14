@@ -16,7 +16,7 @@
 static void 
 peek(	uint32_t adress, uint32_t chunks)
 		{			
-			printk("Reading %d chunks from memory %x\n",chunks, adressptr);
+			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
