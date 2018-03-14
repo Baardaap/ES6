@@ -21,6 +21,7 @@ readFromMem(	uint32_t adress)
 			    return *adressptr;
 			}
 
+//read multiple values from multiple memory adresses
 static char* 
 peek(	uint32_t initAdress, uint32_t chunks)
 		{
@@ -63,7 +64,7 @@ sysfs_store(struct device *dev,
 			{
 				printk(KERN_INFO "sysfile_write (/sys/kernel/%s/%s) called\n",sysfs_dir,sysfs_file);
 
-				char command = '';
+				char command = ' ';
 				uint32_t adress = 0;
 				uint32_t amountOrValue = 0;
 				sscanf(buffer, "%c %u %u", &command, &adress, &amountOrValue);
