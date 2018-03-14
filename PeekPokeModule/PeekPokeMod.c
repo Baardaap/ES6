@@ -5,24 +5,12 @@
 
 #include <mach/hardware.h>
 
-#include <string.h>
+#include <linux/string.h>
 
 #define sysfs_dir "peekpoke"
 #define sysfs_file "data"
 
 #define sysfs_max_data_size 1024
-
-static char* 
-peek(	uint32_t initAdress, uint32_t chunks)
-		{
-			char *buffer;
-			int i;
-			for(i = 0; i < chunks; i++)
-			{
-				strcat(buffer,(char*)peek(initAdress+i));
-			}
-			return buffer;
-		}
 
 //read a value from a memory adress 
 static uint32_t
@@ -42,6 +30,18 @@ poke(	uint32_t adress,
 				*adressptr = value;
 				return;
 			}
+
+static char* 
+peek(	uint32_t initAdress, uint32_t chunks)
+		{
+			char *buffer;
+			int i;
+			for(i = 0; i < chunks; i++)
+			{
+				strcat(buffer,(char*)readFromMem(initAdress+i));
+			}
+			return buffer;
+		}
 
 static char sysfs_buffer[sysfs_max_data_size+1] = "Test Message\n";
 static ssize_t used_buffer_size =0;
