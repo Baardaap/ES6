@@ -16,6 +16,7 @@
 static uint32_t
 readFromMem(	uint32_t adress)
 			{
+				printk(KERN_INFO "Method readFromMem\n");
 			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
 			    printk("%d\n", *adressptr);
 			    return *adressptr;
@@ -25,6 +26,7 @@ readFromMem(	uint32_t adress)
 static char* 
 peek(	uint32_t initAdress, uint32_t chunks)
 		{
+			printk(KERN_INFO "Method peek\n");
 			char *buffer;
 			int i;
 			for(i = 0; i < chunks; i++)
@@ -39,6 +41,7 @@ static void
 poke(	uint32_t adress,
 			uint32_t value)
 			{
+				printk(KERN_INFO "Method poke\n");
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress);
 				*adressptr = value;
 				return;
@@ -71,6 +74,7 @@ sysfs_store(struct device *dev,
 
 				switch(command){
 					case 'r':
+						printk(KERN_INFO "Command: %c, Adress: %u, Amount or Value: %u\n",command, adress, amountOrValue);
 						buffer = peek(adress, amountOrValue);
 					break;
 
@@ -79,7 +83,7 @@ sysfs_store(struct device *dev,
 					break;
 
 					default:
-						printk(KERN_INFO "Command: %c is not a valid command. Try 'r' or 'w'.", command);
+						printk(KERN_INFO "Command: %c is not a valid command. Try 'r' or 'w'.\n", command);
 					break;
 				}
 				
