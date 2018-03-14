@@ -19,15 +19,16 @@ static ssize_t used_buffer_size =0;
 static void 
 peek(	uint32_t adress, uint32_t chunks)
 		{
-			//strcpy(sysfs_buffer, "");
+			char* buffer = "";
 			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
 			    printk("%d\n", *adressptr);
-				//strcat(sysfs_buffer, (const char*)adressptr);
+				strcat(buffer, (const char*)adressptr);
 			}
+			printk("Buffer string contains: %s", buffer);
 			return;
 		}
 
