@@ -61,10 +61,10 @@ sysfs_store(struct device *dev,
 				uint32_t adress = 0;
 				uint32_t amountOrValue = 0;
 				sscanf(buffer, "%c %x %u", &command, &adress, &amountOrValue);
+				printk(KERN_INFO "Command: %c, Adress: %x, Amount or Value: %u\n",command, adress, amountOrValue);
 
 				switch(command){
 					case 'r':
-						printk(KERN_INFO "Command: %c, Adress: %u, Amount or Value: %u\n",command, adress, amountOrValue);
 						peek(adress, amountOrValue);
 					break;
 
