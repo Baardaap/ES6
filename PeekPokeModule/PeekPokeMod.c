@@ -12,18 +12,22 @@
 
 #define sysfs_max_data_size 1024
 
+static char sysfs_buffer[sysfs_max_data_size+1] = "No command executed yet\n";
+static ssize_t used_buffer_size =0;
+
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t adress, uint32_t chunks, const char *buffer)
-		{
-			strcpy(buffer, "");			
+peek(	uint32_t adress, uint32_t chunks)
+		{	
+
+			strcpy(sysfs_buffer, "");	
 			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
 			    printk("%d\n", *adressptr);
-				strcat(buffer, adressptr);
+				strcat(sysfs_buffer, (const char*)adressptr);
 			}
 			return;
 		}
@@ -38,9 +42,6 @@ poke(	uint32_t adress,
 				*adressptr = value;
 				return;
 			}
-
-static char sysfs_buffer[sysfs_max_data_size+1] = "No command executed yet\n";
-static ssize_t used_buffer_size =0;
 
 static ssize_t
 sysfs_show(	struct device *dev,
@@ -66,8 +67,8 @@ sysfs_store(struct device *dev,
 				printk(KERN_INFO "Command: %c, Adress: %x, Amount or Value: %u\n",command, adress, amountOrValue);
 
 				switch(command){
-					case 'r':
-						peek(adress, amountOrValue, buffer);
+					case 'r':	
+						peek(adress, amountOrValue);
 					break;
 
 					case 'w':
@@ -80,7 +81,7 @@ sysfs_store(struct device *dev,
 				}
 				
 				//used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
-				memcpy(sysfs_buffer,buffer,sysfs_max_data_size);
+				//memcpy(sysfs_buffer,buffer,sysfs_max_data_size);
 				//sysfs_buffer[used_buffer_size] = '\0';
 
 				
