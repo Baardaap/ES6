@@ -43,6 +43,18 @@ poke(	uint32_t adress,
 				return;
 			}
 
+static char* 
+peek(	uint32_t initAdress, uint32_t chunks)
+		{
+			char *buffer;
+			int i;
+			for(i = 0; i < chunks; i++)
+			{
+				strcat(buffer,(char*)readFromMem(initAdress+i));
+			}
+			return buffer;
+		}
+
 static char sysfs_buffer[sysfs_max_data_size+1] = "Test Message\n";
 static ssize_t used_buffer_size =0;
 
@@ -66,7 +78,7 @@ sysfs_store(struct device *dev,
 				char command = '';
 				uint32_t adress = 0;
 				uint32_t amountOrValue = 0;
-				sscanf(buffer, "%c %u %u", &command, &adress, &amountOrValue);
+				sscanf(buffer, "%c %u %u", command, adress, amountOrValue);
 
 				switch(command){
 					case 'r':
@@ -81,10 +93,13 @@ sysfs_store(struct device *dev,
 						printk(KERN_INFO "Command: %c is not a valid command. Try 'r' or 'w'.", command);
 					break;
 				}
-
+				
 				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
 				memcpy(sysfs_buffer,buffer,used_buffer_size);
 				sysfs_buffer[used_buffer_size] = '\0';
+
+				
+
 				return used_buffer_size;
 			}
 
