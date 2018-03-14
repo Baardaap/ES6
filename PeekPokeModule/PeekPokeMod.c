@@ -5,14 +5,28 @@
 
 #include <mach/hardware.h>
 
+#include <string.h>
+
 #define sysfs_dir "peekpoke"
 #define sysfs_file "data"
 
 #define sysfs_max_data_size 1024
 
+static char* 
+peek(	uint32_t initAdress, uint32_t chunks)
+		{
+			char *buffer;
+			int i;
+			for(i = 0; i < chunks; i++)
+			{
+				strcat(buffer,(char*)peek(initAdress+i));
+			}
+			return buffer;
+		}
+
 //read a value from a memory adress 
 static uint32_t
-mem_read(	uint32_t adress)
+readFromMem(	uint32_t adress)
 			{
 			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
 			    printk("%d\n", *adressptr);
@@ -21,7 +35,7 @@ mem_read(	uint32_t adress)
 
 //write a value to a memory adress
 static void
-mem_write(	uint32_t adress,
+poke(	uint32_t adress,
 			uint32_t value)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress);
@@ -51,6 +65,9 @@ sysfs_store(struct device *dev,
 				printk(KERN_INFO "sysfile_write (/sys/kernel/%s/%s) called\n",sysfs_dir,sysfs_file);
 				memcpy(sysfs_buffer,buffer,used_buffer_size);
 				sysfs_buffer[used_buffer_size] = '\0';
+
+				
+
 				return used_buffer_size;
 			}
 
