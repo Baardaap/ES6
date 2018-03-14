@@ -24,14 +24,14 @@ readFromMem(	uint32_t adress)
 
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t initAdress, uint32_t chunks, char* buffer)
+peek(	uint32_t initAdress, uint32_t chunks, char *buffer)
 		{
 			printk(KERN_INFO "Method peek\n");
 			
 			int i;
 			for(i = 0; i <= chunks; i++)
 			{
-				strcat(buffer, (char*)readFromMem(initAdress+i));
+				strcat((char*)buffer, (char*)readFromMem(initAdress+i));
 			}
 			return;
 		}
@@ -75,7 +75,7 @@ sysfs_store(struct device *dev,
 				switch(command){
 					case 'r':
 						printk(KERN_INFO "Command: %c, Adress: %u, Amount or Value: %u\n",command, adress, amountOrValue);
-						peek(adress, amountOrValue, *buffer);
+						peek(adress, amountOrValue, (char*)buffer);
 					break;
 
 					case 'w':
