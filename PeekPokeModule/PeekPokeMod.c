@@ -24,14 +24,14 @@ readFromMem(	uint32_t adress)
 
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t initAdress, uint32_t chunks, char *buffer)
+peek(	uint32_t initAdress, uint32_t chunks, char* buffer)
 		{
 			printk(KERN_INFO "Method peek\n");
 			
 			int i;
 			for(i = 0; i <= chunks; i++)
 			{
-				strcat(buffer, readFromMem(initAdress+i));
+				strcat(buffer, (char*)readFromMem(initAdress+i));
 			}
 			return;
 		}

@@ -34,3 +34,9 @@
 
 #VSCode settings
 .vscode/
+
+#Added for ES6 Assignment
+*.symvers
+*.order
+*.cmd
+*.mod.c
