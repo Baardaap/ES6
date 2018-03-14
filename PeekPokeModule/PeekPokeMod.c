@@ -12,26 +12,16 @@
 
 #define sysfs_max_data_size 1024
 
-//read a value from a memory adress 
-static void
-readFromMem(	uint32_t adress)
-			{
-				printk(KERN_INFO "Method readFromMem\n");
-			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
-			    printk(" reading from memory %d\n", *adressptr);
-			    return;
-			}
-
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t initAdress, uint32_t chunks)
-		{
-			printk(KERN_INFO "Method peek\n");
-			
+peek(	uint32_t adress, uint32_t chunks)
+		{			
+			printk("Reading %d chunks from memory %x\n",chunks, adressptr);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
-				readFromMem(initAdress+i);
+				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
+			    printk("%d\n", *adressptr);
 			}
 			return;
 		}
@@ -41,13 +31,13 @@ static void
 poke(	uint32_t adress,
 			uint32_t value)
 			{
-				printk(KERN_INFO "Method poke\n");
+				printk("Writing value %d to memory %x\n", value, adress);
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress);
 				*adressptr = value;
 				return;
 			}
 
-static char sysfs_buffer[sysfs_max_data_size+1] = "Test Message\n";
+static char sysfs_buffer[sysfs_max_data_size+1] = "No command executed yet\n";
 static ssize_t used_buffer_size =0;
 
 static ssize_t
