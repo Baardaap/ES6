@@ -14,13 +14,15 @@
 
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t adress, uint32_t chunks)
-		{			
+peek(	uint32_t adress, uint32_t chunks, const char *buffer)
+		{
+			buffer = "";			
 			printk("Reading %d chunks from memory %x\n",chunks, adress);
 			int i;
 			for(i = 0; i < chunks; i++)
 			{
 				uint32_t *adressptr = (uint32_t*)io_p2v(adress+i);
+				strcat((char*)buffer, (char*)adressptr);
 			    printk("%d\n", *adressptr);
 			}
 			return;
@@ -65,7 +67,7 @@ sysfs_store(struct device *dev,
 
 				switch(command){
 					case 'r':
-						peek(adress, amountOrValue);
+						peek(adress, amountOrValue, buffer);
 					break;
 
 					case 'w':
