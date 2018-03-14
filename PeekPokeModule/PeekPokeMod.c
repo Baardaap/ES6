@@ -13,25 +13,25 @@
 #define sysfs_max_data_size 1024
 
 //read a value from a memory adress 
-static uint32_t
+static void
 readFromMem(	uint32_t adress)
 			{
 				printk(KERN_INFO "Method readFromMem\n");
 			    uint32_t *adressptr = (uint32_t*)io_p2v(adress);
 			    printk(" reading from memory %d\n", *adressptr);
-			    return *adressptr;
+			    return;
 			}
 
 //read multiple values from multiple memory adresses
 static void 
-peek(	uint32_t initAdress, uint32_t chunks, char *buffer)
+peek(	uint32_t initAdress, uint32_t chunks)
 		{
 			printk(KERN_INFO "Method peek\n");
 			
 			int i;
-			for(i = 0; i <= chunks; i++)
+			for(i = 0; i < chunks; i++)
 			{
-				strcat((char*)buffer, (char*)readFromMem(initAdress+i));
+				readFromMem(initAdress+i);
 			}
 			return;
 		}
@@ -75,7 +75,7 @@ sysfs_store(struct device *dev,
 				switch(command){
 					case 'r':
 						printk(KERN_INFO "Command: %c, Adress: %u, Amount or Value: %u\n",command, adress, amountOrValue);
-						peek(adress, amountOrValue, (char*)buffer);
+						peek(adress, amountOrValue);
 					break;
 
 					case 'w':
