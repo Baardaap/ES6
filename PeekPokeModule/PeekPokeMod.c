@@ -25,7 +25,6 @@ peek(	uint32_t adress, uint32_t chunks, const char *buffer)
 			    printk("%d\n", *adressptr);
 				strcat(buffer, adressptr);
 			}
-			strcat(buffer, '\0');
 			return;
 		}
 
@@ -80,9 +79,9 @@ sysfs_store(struct device *dev,
 					break;
 				}
 				
-				used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
-				memcpy(sysfs_buffer,buffer,used_buffer_size);
-				sysfs_buffer[used_buffer_size] = '\0';
+				//used_buffer_size = count > sysfs_max_data_size ? sysfs_max_data_size :count;
+				memcpy(sysfs_buffer,buffer,sysfs_max_data_size);
+				//sysfs_buffer[used_buffer_size] = '\0';
 
 				
 
