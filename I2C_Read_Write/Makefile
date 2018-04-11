@@ -1,5 +1,5 @@
-CC= gcc
-CFLAGS= -Wall -O2 -std=c99
+CC= arm-linux-gcc
+CFLAGS= -Wall -O2
 LDFLAGS= 
 
 PROG= i2c_hw
