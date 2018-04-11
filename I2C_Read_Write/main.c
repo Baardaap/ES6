@@ -7,16 +7,20 @@
 
 #define DEVICE "/dev/i2c-0"
 
+#define HEXADECIMAL 16
+#define COMMANDMASK 0x01
+
 int main(int argc, char* argv[])
 {
-    __uint8_t command = strtol(argv[1], NULL, 16) & 0x01;
-    __uint8_t slaveAddress = strtol(argv[1], NULL, 16) >> 1;
-    __uint8_t registerAddress = strtol(argv[2], NULL, 16);
+    __uint8_t command = strtol(argv[1], NULL, HEXADECIMAL) & COMMANDMASK;
+    __uint8_t slaveAddress = strtol(argv[1], NULL, HEXADECIMAL) >> 1;
+    __uint8_t registerAddress = strtol(argv[2], NULL, HEXADECIMAL);
     __uint8_t parameters[argc-3];
+    
     int parameterCount;
     for(parameterCount = 0; parameterCount < argc-3; parameterCount++)
     {
-        long int temp = strtol(argv[parameterCount+3], NULL, 16);
+        long int temp = strtol(argv[parameterCount+3], NULL, HEXADECIMAL);
         if(temp > 0xff)
         {
             printf("Argument %d is invalid\n", parameterCount);
@@ -46,7 +50,6 @@ int main(int argc, char* argv[])
     }
     else printf("Slave with address: %x selected\n", slaveAddress);
 
-    /*Check last bit of the I2C adress to read the command*/
     if(command)
     {
         /*Read value from adress*/
