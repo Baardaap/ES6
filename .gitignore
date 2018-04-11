@@ -40,3 +40,5 @@
 *.order
 *.cmd
 *.mod.c
+looplicht
+i2c_hw
