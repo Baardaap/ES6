@@ -1,11 +1,13 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <math.h>
 
 #include <signal.h>
 
 #include "i2c_ext.h"
 #include "pca9532.h"
+
 
 #define DEVICE "/dev/i2c-0"
 
@@ -80,7 +82,7 @@ int main(int argc, char* argv[])
     if(scanf("%f", &input))
     {
         pwm = (input)*(PWM_MAX/INPUT_POWER_MAX);
-        i2c_smbus_write_byte_data(dev, PCA9532_LEDMODE_PWM0, pwm);
+        i2c_smbus_write_byte_data(dev, PCA9532_LEDMODE_PWM0, (__uint8_t)pwm);
     }
     printf("Set power is: %f%%\n", input);
 
