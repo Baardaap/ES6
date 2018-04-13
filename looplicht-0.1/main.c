@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         //convert Hz to Microseconds for the usleep;
         delay = (1/input)*MICROSECOND;
     }
-    printf("Set delay is: %fHz\n", input);
+    printf("Set delay is: %dHz\n", (int)input);
 
     printf("Enter the light power in %%:\n");
     if(scanf("%f", &input))
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
         pwm = (input)*(PWM_MAX/INPUT_POWER_MAX);
         i2c_smbus_write_byte_data(dev, PCA9532_LEDMODE_PWM0, (__uint8_t)pwm);
     }
-    printf("Set power is: %f%%\n", input);
+    printf("Set power is: %d%%\n", (int)input);
 
 
     while(!stopFlag)
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 	    break;
     }
 
-    close(dev);
+    close(dev); 
 
     return 0;
 }
