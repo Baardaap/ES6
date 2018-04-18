@@ -36,8 +36,6 @@ MODULE_DESCRIPTION("A PWM driver for the LPC3250");
 #define BASE_FREQ           32768
 
 int deviceOpened = 0;
-char message[BUFFER_LENGTH];
-
 int major;
 
 
@@ -143,30 +141,20 @@ uint8_t setPWM_Div(uint8_t division, uint8_t pwmID)
 
 static ssize_t device_read(struct file *filp, char *buff, size_t len, loff_t *off)
 {
-    ssize_t bytes_read = 0;
-    return bytes_read;
+    //TODO
 }
 
-static ssize_t device_write(struct file *filp, char *buff, size_t len, loff_t *off)
+static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off)
 {
     uint8_t minor = (uint32_t)filp->private_data;
-    int writeValue = -1;
+    unsigned int writeValue = -1;
+    unsigned int ret;
 
-    /* int;
-    for(i=0; i < len && i < BUFFER_LENGTH; i++)
+    ret = sscanf(buff, "%d", &writeValue);
+    if(ret == 0)
     {
-        get_user(message[i], buff + i);
-    } */
-
-    //sscanf(messagePtr, "%d", &writeValue);
-
-    if(copy_to_user(buff, message, BUFFER_LENGTH) != 0)
-    {
-        printk(KERN_INFO "Error: Copy to user failed\n");
-    }
-    else
-    {
-        printk(KERN_INFO "%s", message);
+        printk(KERN_INFO "Sscanf read: %d\n", &writeValue);
+        return -1;
     }
 
     switch(minor)
