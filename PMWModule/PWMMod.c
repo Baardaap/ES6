@@ -37,7 +37,6 @@ MODULE_DESCRIPTION("A PWM driver for the LPC3250");
 
 int deviceOpened = 0;
 char message[BUFFER_LENGTH];
-char *messagePtr;
 
 int major;
 
@@ -142,25 +141,33 @@ uint8_t setPWM_Div(uint8_t division, uint8_t pwmID)
     return 0;
 }
 
-static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t *offset)
+static ssize_t device_read(struct file *filp, char *buff, size_t len, loff_t *off)
 {
     ssize_t bytes_read = 0;
     return bytes_read;
 }
 
-static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off)
+static ssize_t device_write(struct file *filp, char *buff, size_t len, loff_t *off)
 {
     uint8_t minor = (uint32_t)filp->private_data;
     int writeValue = -1;
 
-    uint8_t i;
+    /* int;
     for(i=0; i < len && i < BUFFER_LENGTH; i++)
     {
         get_user(message[i], buff + i);
-    }
+    } */
 
-    messagePtr = message;
-    sscanf(messagePtr, "%d", &writeValue);
+    //sscanf(messagePtr, "%d", &writeValue);
+
+    if(copy_to_user(buff, message, BUFFER_LENGTH) != 0)
+    {
+        printk(KERN_INFO "Error: Copy to user failed\n");
+    }
+    else
+    {
+        printk(KERN_INFO "%s", message);
+    }
 
     switch(minor)
     {
@@ -200,8 +207,6 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
 static int device_open(struct inode *inode, struct file *file)
 {
     int minor = MINOR(inode->i_rdev);
-
-	messagePtr = message;
 	
 	file->private_data = (void*)minor;
 
@@ -235,8 +240,7 @@ int init_module(void)
         printk(KERN_INFO "Registering device failed, Error: %d\n", major);
         return major;
     }
-    printk(KERN_INFO "Registering device %s on major: %d succeeded \
-    Please use 'mknod' to create the appropriate files\n", NAME, major); 
+    printk(KERN_INFO "Registering device %s on major: %d succeeded\nPlease use 'mknod' to create the appropriate files\n", NAME, major); 
 
     *(uint32_t*)(io_p2v(PWMCLOCK_REG)) = PWMCLOCK_VAL;
     *(uint32_t*)(io_p2v(LCDCLOCK_REG)) = LCDCLOCK_VAL;
