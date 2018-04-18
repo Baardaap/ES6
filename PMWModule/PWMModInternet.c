@@ -33,6 +33,7 @@ static char *Message_Ptr;
 static int device_open(struct inode *inode, struct file *file) {
 	int minor = MINOR(inode->i_rdev);
 
+
 	Message_Ptr = Message;
 	
 	file->private_data = (void*)minor;

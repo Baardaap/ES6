@@ -42,15 +42,15 @@ char *messagePtr;
 int major;
 
 
-uint8_t calculateReloadValue(float freq, uint8_t div)
+/* uint8_t calculateReloadValue(float freq, uint8_t division)
 {
-    uint8_t reloadValue = (BASE_FREQ / div)/(256 * freq);
+    uint8_t reloadValue = (BASE_FREQ / division)/(256 * freq);
     if(reloadValue >= 256)
     {
         reloadValue = 0;
     }
     return reloadValue;
-}
+} */
 
 uint8_t calculateDutyValue(uint8_t duty) 
 {
@@ -108,38 +108,17 @@ void setPWM_DutyCycle(uint8_t duty, uint8_t pwmID)
     }
 }
 
-void setPWM_ReloadValue(float freq, uint8_t pwmID, uint8_t div)
+void setPWM_ReloadValue(uint8_t rel, uint8_t pwmID, uint8_t division)
 {
-    uint8_t err = 0;
+    uint32_t writeRegister = getPWMRegister(pwmID);
+    uint32_t clearMask = CLEAR_MASK << REL_SHIFT;
+    uint32_t writeMask = rel << REL_SHIFT;
 
-    if(div == 1)
-    {
-        if(freq < 0.5 || freq > 128)
-        {
-            printk(KERN_INFO "Error: Wrong Input\n");
-            err = 1;
-        }
-    }
-    else if(div == 15)
-    {
-        if(freq < 0.033 || freq > 8.533)
-        {
-            printk(KERN_INFO "Error: Wrong Input\n");
-            err = 1;
-        }
-    }
-    if(err)
-    {
-        uint32_t writeRegister = getPWMRegister(pwmID);
-        uint32_t clearMask = CLEAR_MASK << REL_SHIFT;
-        uint32_t writeMask = calculateReloadValue(freq, div) << REL_SHIFT;
-
-        *(uint32_t*)(io_p2v(writeRegister)) &= ~clearMask;
-        *(uint32_t*)(io_p2v(writeRegister)) |= writeMask;
-    }
+    *(uint32_t*)(io_p2v(writeRegister)) &= ~clearMask;
+    *(uint32_t*)(io_p2v(writeRegister)) |= writeMask;
 }
 
-uint8_t setPWM_Div(uint8_t div, uint8_t pwmID)
+uint8_t setPWM_Div(uint8_t division, uint8_t pwmID)
 {
     uint8_t bitsToShift = 0;
     if(pwmID == 1)
@@ -158,7 +137,7 @@ uint8_t setPWM_Div(uint8_t div, uint8_t pwmID)
     uint32_t clearMask = (uint32_t)DIV_CLEAR_MASK << bitsToShift;
     *(uint32_t*)(io_p2v(PWMCLOCK_REG)) &= clearMask;
 
-    uint32_t setMask = (uint32_t)div << bitsToShift;
+    uint32_t setMask = (uint32_t)division << bitsToShift;
     *(uint32_t*)(io_p2v(PWMCLOCK_REG)) |= setMask;
     return 0;
 }
@@ -172,7 +151,7 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off)
 {
     uint8_t minor = (uint32_t)filp->private_data;
-    float writeValue = -1;
+    int writeValue = -1;
 
     uint8_t i;
     for(i=0; i < len && i < BUFFER_LENGTH; i++)
@@ -181,15 +160,15 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
     }
 
     messagePtr = message;
-    sscanf(messagePtr, "%f", &writeValue);
+    sscanf(messagePtr, "%d", &writeValue);
 
     switch(minor)
     {
         case 0: //Enable PWM1
-            enablePWM((uint8_t)writeValue, PWMID1);
+            enablePWM(writeValue, PWMID1);
             break;
         case 1: //Enable PWM2
-            enablePWM((uint8_t)writeValue, PWMID2);
+            enablePWM(writeValue, PWMID2);
             break;
         case 2: //PWM 1 High Frequency
             setPWM_Div(DIV_HIGH_FREQ, PWMID1);
