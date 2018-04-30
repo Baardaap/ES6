@@ -1,3 +1,6 @@
+#ifndef _PINS_H
+#define _PINS_H
+
 #include <string.h>
 
 typedef struct {
@@ -45,3 +48,5 @@ ports_t J3list[] = {
   {"P3.0",54},
   {"P3.1",46},
   {"P3.4",36}};
+
+  #endif //PINS_H
