@@ -49,4 +49,4 @@ ports_t J3list[] = {
   {"P3.1",46},
   {"P3.4",36}};
 
-  #endif //PINS_H
+  #endif /*_PINS_H*/
