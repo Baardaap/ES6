@@ -1,5 +1,5 @@
-#ifndef _PINS_H
-#define _PINS_H
+#ifndef LPC3250PINS_H
+#define LPC3250PINS_H
 
 #include <string.h>
 
