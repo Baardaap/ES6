@@ -1,10 +1,9 @@
 #ifndef LPC3250PINS_H
 #define LPC3250PINS_H
 
-#include <string.h>
 
 typedef struct {
-  char LPC[5];
+  char LPC[6];
   int  QVGA;
 } ports_t;
 
