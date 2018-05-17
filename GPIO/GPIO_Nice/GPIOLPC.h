@@ -37,8 +37,11 @@
 #define P1_MUX_SET_VALUE 0xFF8000
 #define P2_MUX_SET_VALUE 8
 
-void setPin(char LPCpin[]);
-uint32_t readPin(char LPCpin[]);
-char* findnumber(int PinNumber, ports_t Port);
+void initGPIO(void);
+void setPinDir(int pinNr, char dir, ports_t port);
+void setPinOut(int pinNr, char output, ports_t port);
+uint32_t readPin(int pinNr, ports_t port);
+char* findPin(int PinNumber, ports_t Port);
+int  power(int value, int index); 
 
 #endif

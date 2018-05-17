@@ -4,9 +4,17 @@
 #include <linux/init.h>
 #include <linux/kobject.h>
 #include <linux/device.h>
+#include  "GPIOLPC.h"
+#include  "LPC3250pins.h"
+
+#define DEVICE_NAME "GPIOnode"
+#define MAJORNUMBER 99 
 
 #define sysfs_dir  "buffer"
 #define sysfs_file "data"
+
+int jumperToRead = -1;
+int pinToRead = -1;
 
 struct file_operations Fops =
 {
@@ -38,13 +46,36 @@ static ssize_t sysfs_store(struct device *dev, struct device_attribute *attr, co
         printk(KERN_INFO "Input error!"); 
     }
     else
-    { 
-        if(IO == 'I')
-            result = findAndSetPin(jumper,indexpin,SET_PORT,SET_I);
-        else if (IO == 'O')
-            result = findAndSetPin(jumper,indexpin,SET_PORT,SET_O);
-        else 
-            printk(KERN_INFO "Input error! -> enter I or O");
+    {
+        switch(jumper) 
+        {
+            case 1:
+                if(IO == 'I'|| IO == 'O')
+                    setPinDir(indexpin, IO, J1list);
+                else 
+                    printk(KERN_INFO "Input error! -> enter I or O");
+
+            break;
+
+            case 2:
+                if(IO == 'I'|| IO == 'O')
+                    setPinDir(indexpin, IO, J2list);
+                else 
+                    printk(KERN_INFO "Input error! -> enter I or O");
+
+            break;
+
+            case 3:
+                if(IO == 'I'|| IO == 'O')
+                    setPinDir(indexpin, IO, J3list);
+                else 
+                    printk(KERN_INFO "Input error! -> enter I or O");
+            break;
+
+            default:
+                printk(KERN_INFO "Input error! -> enter 1-3 for the jumper")
+            break;
+        }
 
     }
 
@@ -81,12 +112,73 @@ static ssize_t device_read(struct file *file,
                            size_t length,      
                            loff_t * offset)
 {
-    //To Do
+    int result = -1; 
+    int i;
+    if(jumperToRead == -1 || pinToRead ==  -1)
+    {
+        printk(KERN_INFO "Read Commando not executed!");
+        return 0;
+    }
+    else
+    {
+        switch(jumperToRead)
+        {
+        case 1:
+            pinToRead(J1list);
+        break;
+
+        case 2:
+            pinToRead(J1list);
+        break;
+
+        case 3:
+            pinToRead(J1list);
+        break;
+        }
+    }
+    return 0;
 }
 
 static ssize_t device_write(struct file *file, const char *buff, size_t length, loff_t * off)
 {
-    //To Do
+    int minornumber = (int)file->private_data;
+    int result = 0; 
+    int jumper = 0;
+    int indexpin = 0;
+    char value = '\0';
+
+    result = sscanf(buff,"J%i.%i %c", &jumper, &indexpin, &value); 
+    if (result != 3)
+    {
+         printk(KERN_INFO "Input error!"); 
+    } else
+    {   
+        ports_t port;
+        if(jumper ==  1)
+            port = J1list;
+        else if (jumper == 2)
+            port = J2list;
+        else if (jumper  == 3)
+             port = J3list;
+
+        if(minornumber == 0) 
+        {   
+            if(value == 'H')
+                setPinDir(indexpin, 'O',port);
+            else if (value == 'L')
+                setPinDir(indexpin, 'O',port);
+            else if (value == 'R')
+            {
+                jumperToRead = jumper;
+                pinToRead = indexpin;
+                setPinDir(indexpin, 'I',port);
+            }
+            else 
+                printk(KERN_INFO "Input error! -> enter H (high) L (low) R (read)");
+        }
+        
+    }
+    return length;
 }
 
 static DEVICE_ATTR(data, S_IWUGO | S_IRUGO, sysfs_show, sysfs_store);
@@ -125,6 +217,8 @@ int init_module (void)
     printk(KERN_INFO "Try various minor numbers. Try to cat and echo to\n");
     printk(KERN_INFO "the device file.\n");
     printk(KERN_INFO "Remove the device file and module when done.\n");
+
+    initGPIO();
 
     return result;
 }

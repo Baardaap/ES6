@@ -1,10 +1,9 @@
 #ifndef LPC3250PINS_H
 #define LPC3250PINS_H
 
-
 typedef struct {
   char LPC[6];
-  int  QVGA;
+  int  PINS;
 } ports_t;
 
 ports_t J1list[] = {
@@ -48,4 +47,4 @@ ports_t J3list[] = {
   {"P3.1",46},
   {"P3.4",36}};
 
-  #endif /*_PINS_H*/
+  #endif 
