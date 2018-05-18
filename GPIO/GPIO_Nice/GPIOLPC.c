@@ -7,7 +7,7 @@
 #include <asm/io.h>
 #include <asm/uaccess.h>
 
-void setPinDir(int pinNr,int dir, ports_t port)
+void setPinDir(int pinNr, char dir, ports_t* port)
 {
     char* pin = findPin(pinNr, port);
     int result;
@@ -46,7 +46,7 @@ void setPinDir(int pinNr,int dir, ports_t port)
     }      
 }
 
-void setPinOut(int pinNr, char output, ports_t port)
+void setPinOut(int pinNr, char output, ports_t* port)
 {
     char* pin = findPin(pinNr, port);
     int result;
@@ -85,9 +85,9 @@ void setPinOut(int pinNr, char output, ports_t port)
     }
 }
 
-uint32_t readPin(int pinNr, ports_t port)
+uint32_t readPin(int pinNr, ports_t* port)
 {
-     char* pin = findPin(pinNr, port);
+    char* pin = findPin(pinNr, port);
     int result;
     int PortP = 0;
     int PIndex = 0;
@@ -110,18 +110,20 @@ uint32_t readPin(int pinNr, ports_t port)
             return ioread32(io_p2v(P0_INP_STATE));
         break;    
     }
+    return -1;
 }
 
-char* findPin(int PinNumber, ports_t Port)
+char* findPin(int PinNumber, ports_t* Port)
 {
     int i;
     for (i = 0; i < (sizeof(Port) / sizeof(Port[0])); i++)
     {
-        if (J1list[i].PINS == PinNumber)
+        if (Port[i].PINS == PinNumber)
         {
                 return Port[i].LPC;
         } 
     }
+    return "";
 }
 
 int power(int value, int index) 

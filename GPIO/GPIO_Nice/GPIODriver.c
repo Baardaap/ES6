@@ -4,6 +4,8 @@
 #include <linux/init.h>
 #include <linux/kobject.h>
 #include <linux/device.h>
+#include <asm/uaccess.h>
+
 #include  "GPIOLPC.h"
 #include  "LPC3250pins.h"
 
@@ -13,16 +15,14 @@
 #define sysfs_dir  "buffer"
 #define sysfs_file "data"
 
+#define sysfs_max_data_size 1024 
+static char sysfs_buffer[sysfs_max_data_size+1] = ""; 
+static ssize_t used_buffer_size = 0;
+
+static int Device_Open = 0;
+
 int jumperToRead = -1;
 int pinToRead = -1;
-
-struct file_operations Fops =
-{
-    .read = device_read,
-    .write = device_write,
-    .open = device_open,
-    .release = device_release,
-};
 
 static ssize_t sysfs_show(struct device *dev, struct device_attribute *attr, char *buffer)
 {
@@ -73,7 +73,7 @@ static ssize_t sysfs_store(struct device *dev, struct device_attribute *attr, co
             break;
 
             default:
-                printk(KERN_INFO "Input error! -> enter 1-3 for the jumper")
+                printk(KERN_INFO "Input error! -> enter 1-3 for the jumper");
             break;
         }
 
@@ -111,9 +111,8 @@ static ssize_t device_read(struct file *file,
                            char *buffer,        
                            size_t length,      
                            loff_t * offset)
-{
-    int result = -1; 
-    int i;
+{ 
+    char result[11];
     if(jumperToRead == -1 || pinToRead ==  -1)
     {
         printk(KERN_INFO "Read Commando not executed!");
@@ -124,17 +123,18 @@ static ssize_t device_read(struct file *file,
         switch(jumperToRead)
         {
         case 1:
-            pinToRead(J1list);
+            sprintf(result, "%d" , readPin(pinToRead, &J1list));
         break;
 
         case 2:
-            pinToRead(J1list);
+            sprintf(result, "%d", readPin(pinToRead, &J2list));
         break;
 
         case 3:
-            pinToRead(J1list);
+            sprintf(result, "%d", readPin(pinToRead, &J1list));
         break;
         }
+        put_user(result, buffer);
     }
     return 0;
 }
@@ -153,7 +153,7 @@ static ssize_t device_write(struct file *file, const char *buff, size_t length, 
          printk(KERN_INFO "Input error!"); 
     } else
     {   
-        ports_t port;
+        ports_t* port;
         if(jumper ==  1)
             port = J1list;
         else if (jumper == 2)
@@ -164,14 +164,14 @@ static ssize_t device_write(struct file *file, const char *buff, size_t length, 
         if(minornumber == 0) 
         {   
             if(value == 'H')
-                setPinDir(indexpin, 'O',port);
+                setPinDir(indexpin, 'O', port);
             else if (value == 'L')
-                setPinDir(indexpin, 'O',port);
+                setPinDir(indexpin, 'O', port);
             else if (value == 'R')
             {
                 jumperToRead = jumper;
                 pinToRead = indexpin;
-                setPinDir(indexpin, 'I',port);
+                setPinDir(indexpin, 'I', port);
             }
             else 
                 printk(KERN_INFO "Input error! -> enter H (high) L (low) R (read)");
@@ -180,6 +180,14 @@ static ssize_t device_write(struct file *file, const char *buff, size_t length, 
     }
     return length;
 }
+
+struct file_operations Fops =
+{
+    .read = device_read,
+    .write = device_write,
+    .open = device_open,
+    .release = device_release,
+};
 
 static DEVICE_ATTR(data, S_IWUGO | S_IRUGO, sysfs_show, sysfs_store);
 static struct attribute *attrs[] = { &dev_attr_data.attr, NULL};
@@ -226,7 +234,7 @@ int init_module (void)
 void cleanup_module(void)
 {
     unregister_chrdev(MAJORNUMBER, DEVICE_NAME);
-    kobject_put(hello_obj);
+    kobject_put(gpio_obj);
     printk (KERN_INFO "/sys/kernel/%s/%s removed\n", sysfs_dir, sysfs_file);
 }
 
