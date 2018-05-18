@@ -10,28 +10,28 @@ void setPinDir(int pinNr, char dir, ports_t* port)
     switch(PortP)
     {
         case 0:
-            if (dir == 'O')
+            if (dir == 'I')
                 iowrite32(power(2,PIndex),io_p2v(P0_DIR_CLEAR));
             else
                 iowrite32(power(2,PIndex),io_p2v(P0_DIR_SET));
         break;
 
         case 1:
-            if (dir == 'O')
+            if (dir == 'I')
                 iowrite32(power(2,PIndex),io_p2v(P1_DIR_CLEAR));
             else
                 iowrite32(power(2,PIndex),io_p2v(P1_DIR_SET));
         break;
 
         case 2:
-            if (dir == 'O')
+            if (dir == 'I')
                 iowrite32(power(2,PIndex),io_p2v(P2_P3_DIR_CLEAR));
             else
                 iowrite32(power(2,PIndex),io_p2v(P2_P3_DIR_SET));
         break;
 
         case 3:
-            if (dir == 'O')
+            if (dir == 'I')
                 iowrite32(power(2,PIndex),io_p2v(P2_P3_DIR_CLEAR));
             else
                 iowrite32(power(2,PIndex),io_p2v(P2_P3_DIR_SET));
@@ -63,7 +63,7 @@ void setPinOut(int pinNr, char output, ports_t* port)
         break;
 
         case 2:
-        if (output == 'H')
+            if (output == 'H')
                 iowrite32(power(2,PIndex),io_p2v(P2_OUT_SET));
             else
                 iowrite32(power(2,PIndex),io_p2v(P2_OUT_CLEAR));
@@ -92,15 +92,15 @@ uint32_t readPin(int pinNr, ports_t* port)
         break;
 
         case 1:
-            return ioread32(io_p2v(P0_INP_STATE));
+            return ioread32(io_p2v(P1_INP_STATE));
         break;
 
         case 2:
-            return ioread32(io_p2v(P0_INP_STATE));
+            return ioread32(io_p2v(P2_INP_STATE));
         break;
 
         case 3:
-            return ioread32(io_p2v(P0_INP_STATE));
+            return ioread32(io_p2v(P3_INP_STATE));
         break;    
     }
     return -1;
@@ -109,11 +109,11 @@ uint32_t readPin(int pinNr, ports_t* port)
 char* findPin(int PinNumber, ports_t* Port)
 {
     int i;
-    for (i = 0; i < (sizeof(Port) / sizeof(Port[0])); i++)
+    for (i = 0; i < (sizeof(Port)/sizeof(Port[0])); i++)
     {
         if (Port[i].PINS == PinNumber)
         {
-                return Port[i].LPC;
+            return Port[i].LPC;
         } 
     }
     return "";

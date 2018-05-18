@@ -154,6 +154,7 @@ static ssize_t device_read(struct file *file,
                            loff_t * offset)
 { 
     char result[11];
+    int i;
     if(jumperToRead == -1 || pinToRead ==  -1)
     {
         printk(KERN_INFO "Read Commando not executed!");
@@ -164,20 +165,25 @@ static ssize_t device_read(struct file *file,
         switch(jumperToRead)
         {
         case 1:
-            sprintf(result, "%d" , readPin(pinToRead, &J1list));
+            sprintf(result, "%i" , readPin(pinToRead, J1list));
         break;
 
         case 2:
-            sprintf(result, "%d", readPin(pinToRead, &J2list));
+            sprintf(result, "%i", readPin(pinToRead, J2list));
         break;
 
         case 3:
-            sprintf(result, "%d", readPin(pinToRead, &J3list));
+            sprintf(result, "%i", readPin(pinToRead, J3list));
         break;
         }
-        put_user(result, buffer);
+
+        printk(KERN_INFO, "J%i.%i = %s", jumperToRead, pinToRead, result);
+        for(i = 0; i < (sizeof(result)/sizeof(result[0])); i++)
+        {
+            put_user(&result[i], &buffer[i]);
+        }
     }
-    return 0;
+    return i;
 }
 
 static ssize_t device_write(struct file *file, const char *buff, size_t length, loff_t * off)
@@ -200,24 +206,22 @@ static ssize_t device_write(struct file *file, const char *buff, size_t length, 
         else if (jumper == 2)
             port = J2list;
         else if (jumper  == 3)
-             port = J3list;
+            port = J3list;
 
         if(minornumber == 0) 
         {   
             if(value == 'H')
-                setPinDir(indexpin, 'O', port);
+                setPinOut(indexpin, value, port);
             else if (value == 'L')
-                setPinDir(indexpin, 'O', port);
+                setPinOut(indexpin, value, port);
             else if (value == 'R')
             {
                 jumperToRead = jumper;
                 pinToRead = indexpin;
-                setPinDir(indexpin, 'I', port);
             }
             else 
                 printk(KERN_INFO "Input error! -> enter H (high) L (low) R (read)");
         }
-        
     }
     return length;
 }
