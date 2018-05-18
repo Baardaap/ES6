@@ -1,11 +1,4 @@
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/init.h>
-#include <mach/hardware.h>
-#include "LPC3250pins.h"
 #include "GPIOLPC.h"
-#include <asm/io.h>
-#include <asm/uaccess.h>
 
 void setPinDir(int pinNr, char dir, ports_t* port)
 {

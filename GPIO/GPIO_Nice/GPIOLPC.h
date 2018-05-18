@@ -1,7 +1,13 @@
 #ifndef GPIOLPC_H
 #define GPIOLPC_H
 
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <mach/hardware.h>
 #include "LPC3250pins.h"
+#include <asm/io.h>
+#include <asm/uaccess.h>
 
 #define LCDCFGVALUE 0x0
 #define LCD_CFG 0x40004054
