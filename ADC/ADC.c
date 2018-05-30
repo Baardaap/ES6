@@ -55,11 +55,11 @@ static void adc_init (void)
     // TODO
 
 	//IRQ init
-    if (request_irq (/* TODO */, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
-    {
-        printk(KERN_ALERT "ADC IRQ request failed\n");
-    }
-    if (request_irq (/* TODO */, gp_interrupt, IRQF_DISABLED, "", NULL) != 0)
+    // if (request_irq (/* TODO */, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
+    // {
+    //     printk(KERN_ALERT "ADC IRQ request failed\n");
+    // }
+    if (request_irq (IRQ_LPC32XX_GPI_01, gp_interrupt, IRQF_DISABLED, "", NULL) != 0)
     {
         printk (KERN_ALERT "GP IRQ request failed\n");
     }
@@ -86,19 +86,19 @@ static void adc_start (unsigned char channel)
     // TODO
 }
 
-static irqreturn_t adc_interrupt (int irq, void * dev_id)
-{
-    adc_values[adc_channel] = /* TODO: read ADC */;
-    printk(KERN_WARNING "ADC(%d)=%d\n", adc_channel, adc_values[adc_channel]);
+// static irqreturn_t adc_interrupt (int irq, void * dev_id)
+// {
+//     adc_values[adc_channel] = /* TODO: read ADC */;
+//     printk(KERN_WARNING "ADC(%d)=%d\n", adc_channel, adc_values[adc_channel]);
 
-    // start the next channel:
-    adc_channel++;
-    if (adc_channel < ADC_NUMCHANNELS)
-    {
-        adc_start (adc_channel);
-    }
-    return (IRQ_HANDLED);
-}
+//     // start the next channel:
+//     adc_channel++;
+//     if (adc_channel < ADC_NUMCHANNELS)
+//     {
+//         adc_start (adc_channel);
+//     }
+//     return (IRQ_HANDLED);
+// }
 
 static irqreturn_t gp_interrupt(int irq, void * dev_id)
 {
@@ -110,8 +110,8 @@ static irqreturn_t gp_interrupt(int irq, void * dev_id)
 
 static void adc_exit (void)
 {
-    free_irq (/* TODO */, NULL);
-    free_irq (/* TODO */, NULL);
+//    free_irq (/* TODO */, NULL);
+    free_irq (IRQ_LPC32XX_GPI_01, NULL);
 }
 
 
