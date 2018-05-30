@@ -1,6 +1,14 @@
 #ifndef GPIOLPC_H
 #define GPIOLPC_H
 
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <mach/hardware.h>
+#include "LPC3250pins.h"
+#include <asm/io.h>
+#include <asm/uaccess.h>
+
 #define LCDCFGVALUE 0x0
 #define LCD_CFG 0x40004054
 
@@ -38,10 +46,10 @@
 #define P2_MUX_SET_VALUE 8
 
 void initGPIO(void);
-void setPinDir(int pinNr, char dir, ports_t port);
-void setPinOut(int pinNr, char output, ports_t port);
-uint32_t readPin(int pinNr, ports_t port);
-char* findPin(int PinNumber, ports_t Port);
+void setPinDir(int pinNr, char dir, ports_t* port);
+void setPinOut(int pinNr, char output, ports_t* port);
+uint32_t readPin(int pinNr, ports_t* port);
+char* findPin(int PinNumber, ports_t* Port);
 int  power(int value, int index); 
 
 #endif
