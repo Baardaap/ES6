@@ -7,6 +7,7 @@
 #include <mach/hardware.h>
 #include <mach/platform.h>
 #include <mach/irqs.h>
+#include <asm/uaccess.h>
 
 #define DEVICE_NAME 		"adc"
 #define ADC_NUMCHANNELS		3
@@ -20,6 +21,8 @@
 #define SIC1_ER             io_p2v(0x4000C000) //Enable Register
 #define AD_PDN_CTRL         1 << 2
 #define ADC_INT             1 << 7 
+#define ADC_READ_MASK       0x1FF
+#define AD_STROBE           1 << 1
 
 
 #define READ_REG(a)         (*(volatile unsigned int *)(a))
@@ -36,6 +39,8 @@ static int              adc_values[ADC_NUMCHANNELS] = {0, 0, 0};
 static irqreturn_t      adc_interrupt (int irq, void * dev_id);
 static irqreturn_t      gp_interrupt (int irq, void * dev_id);
 
+// DECLARE_WAIT_QUEUE_HEAD(ADC_Ready_q);
+// static bool ADCIsReady = false;
 
 static void adc_init (void)
 {
@@ -57,22 +62,17 @@ static void adc_init (void)
     data |=  0x0280;
     WRITE_REG (data, ADC_SELECT);
 
-    //enable ADC Interrupt
-    data = READ_REG(ADC_CTRL);
-    data |= AD_PDN_CTRL;
-    WRITE_REG (data, ADC_CTRL);
-
     //Set GPI01 Flank Detection
     data = READ_REG (SIC2_ATR);
     data |= GPI01;
     WRITE_REG (data, SIC2_ATR);
 
-	// aanzetten adc en reset
+	// Enable ADC Interrupt
     data = READ_REG(SIC1_ER);
     data |= ADC_INT;
     WRITE_REG (data, SIC1_ER);
 
-    //Enable ADC Interrupt
+    //aanzetten adc en reset
     data = READ_REG(ADC_CTRL);
     data |= AD_PDN_CTRL;
     WRITE_REG (data, ADC_CTRL);
@@ -81,10 +81,10 @@ static void adc_init (void)
 
 
 	//IRQ init
-    // if (request_irq (/* TODO */, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
-    // {
-    //     printk(KERN_ALERT "ADC IRQ request failed\n");
-    // }
+    if (request_irq (IRQ_LPC32XX_TS_IRQ, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
+    {
+        printk(KERN_ALERT "ADC IRQ request failed\n");
+    }
 
     if (request_irq (IRQ_LPC32XX_GPI_01, gp_interrupt, IRQF_DISABLED, "", NULL) != 0)
     {
@@ -110,22 +110,30 @@ static void adc_start (unsigned char channel)
 	adc_channel = channel;
 
 	// start conversie
-    // TODO
+    data = READ_REG(ADC_CTRL);
+    data |= AD_STROBE;
+    WRITE_REG (data, ADC_CTRL);
+
+    //wait_event_interruptible(ADC_Ready_q,(ADCIsReady == true));
+
 }
 
-// static irqreturn_t adc_interrupt (int irq, void * dev_id)
-// {
-//     adc_values[adc_channel] = /* TODO: read ADC */;
-//     printk(KERN_WARNING "ADC(%d)=%d\n", adc_channel, adc_values[adc_channel]);
+static irqreturn_t adc_interrupt (int irq, void * dev_id)
+{
+    adc_values[adc_channel] = READ_REG(ADC_VALUE);
+    adc_values[adc_channel] &= ADC_READ_MASK;
+    printk(KERN_WARNING "ADC(%d)=%d\n", adc_channel, adc_values[adc_channel]);
 
-//     // start the next channel:
-//     adc_channel++;
-//     if (adc_channel < ADC_NUMCHANNELS)
-//     {
-//         adc_start (adc_channel);
-//     }
-//     return (IRQ_HANDLED);
-// }
+    // start the next channel:
+    adc_channel++;
+    if (adc_channel < ADC_NUMCHANNELS)
+    {
+        adc_start (adc_channel);
+    }
+    //ADCIsReady =true;
+    //wake_up_interruptible(&ADC_Ready_q);
+    return (IRQ_HANDLED);
+}
 
 static irqreturn_t gp_interrupt(int irq, void * dev_id)
 {
@@ -137,7 +145,7 @@ static irqreturn_t gp_interrupt(int irq, void * dev_id)
 
 static void adc_exit (void)
 {
-//    free_irq (/* TODO */, NULL);
+    free_irq (IRQ_LPC32XX_TS_IRQ, NULL);
     free_irq (IRQ_LPC32XX_GPI_01, NULL);
 }
 
@@ -145,7 +153,15 @@ static void adc_exit (void)
 static ssize_t device_read (struct file * file, char __user * buf, size_t length, loff_t * f_pos)
 {
 	int     channel = (int) file->private_data;
+    char	return_buffer[128];
     int     bytes_read = 0;
+    int     bytesWritten;
+    int     bytesToWrite;
+
+    if (*f_pos > 0) {
+		*f_pos = 0;
+		return 0;
+	}
 
     printk (KERN_WARNING DEVICE_NAME ":device_read(%d)\n", channel);
 
@@ -158,6 +174,12 @@ static ssize_t device_read (struct file * file, char __user * buf, size_t length
 
     // TODO: wait for end-of-conversion,
     // read adc and copy it into 'buf'
+
+    bytesWritten = sprintf(return_buffer, "%d", adc_values[adc_channel]);
+	bytesToWrite = copy_to_user(buf, return_buffer, bytesWritten);
+
+    *f_pos = bytesWritten;
+	return (bytesWritten);
 
     return (bytes_read);
 }
