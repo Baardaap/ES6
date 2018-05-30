@@ -51,6 +51,10 @@ static void adc_init (void)
     data |=  0x0280;
     WRITE_REG (data, ADC_SELECT);
 
+    data = READ_REG (SIC2_ATR);
+    data |= 0x400000;
+    WRITE_REG (data, SIC2_ATR);
+
 	// aanzetten adc en reset
     // TODO
 
@@ -103,7 +107,7 @@ static void adc_start (unsigned char channel)
 static irqreturn_t gp_interrupt(int irq, void * dev_id)
 {
     adc_start (0);
-
+    printk (KERN_INFO DEVICE_NAME "ButtonPressed");
     return (IRQ_HANDLED);
 }
 
@@ -200,6 +204,8 @@ int adcdev_init (void)
 		printk(KERN_WARNING DEVICE_NAME ": unable to add device, error=%d\n", error);
 		return error;
 	}
+
+    SIC2_ATR |= 0x400000
 
 	adc_init();
 
