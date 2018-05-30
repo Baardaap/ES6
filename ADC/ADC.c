@@ -17,6 +17,7 @@
 #define	ADC_SELECT			io_p2v(0x40048004)
 #define	ADC_CTRL			io_p2v(0x40048008)
 #define ADC_VALUE           io_p2v(0x40048048)
+#define SIC1_ER             io_p2v(0x4000C000)
 #define SIC2_ATR            io_p2v(0x40010010)
 
 #define READ_REG(a)         (*(volatile unsigned int *)(a))
@@ -52,7 +53,13 @@ static void adc_init (void)
     WRITE_REG (data, ADC_SELECT);
 
 	// aanzetten adc en reset
-    // TODO
+    data = READ_REG(SIC1_ER);
+    data |= 0x40;
+    WRITE_REG (data, SIC1_ER);
+
+    //data = READ_REG();
+    //data |= ;
+    //WRITE_REG (data, );
 
 	//IRQ init
     // if (request_irq (/* TODO */, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
@@ -201,6 +208,12 @@ int adcdev_init (void)
 		return error;
 	}
 
+    // set EINT0 button to activate on edge
+    unsigned long data;
+    data = READ_REG (SIC2_ATR);
+    data |= 0x400000;
+    WRITE_REG (data, SIC2_ATR);
+    
 	adc_init();
 
 	return 0;
