@@ -17,12 +17,17 @@
 #define	ADC_SELECT			io_p2v(0x40048004)
 #define	ADC_CTRL			io_p2v(0x40048008)
 #define ADC_VALUE           io_p2v(0x40048048)
-#define SIC1_ER             io_p2v(0x4000C000)
-#define SIC2_ATR            io_p2v(0x40010010)
+#define SIC1_ER             io_p2v(0x4000C000) //Enable Register
+#define AD_PDN_CTRL         1 << 2
+#define ADC_INT             1 << 7 
+
 
 #define READ_REG(a)         (*(volatile unsigned int *)(a))
 #define WRITE_REG(b,a)      (*(volatile unsigned int *)(a) = (b))
 
+//GPIO REG
+#define SIC2_ATR            io_p2v(0x40010010)
+#define GPI01               1 << 23
 
 static unsigned char    adc_channel = 0;
 static int              adc_values[ADC_NUMCHANNELS] = {0, 0, 0};
@@ -40,7 +45,7 @@ static void adc_init (void)
     data = READ_REG (ADCLK_CTRL);
     data |= 0x1;
     WRITE_REG (data, ADCLK_CTRL);
-
+    
 	// rtc clock ADC & Display = from PERIPH_CLK
     data = READ_REG (ADCLK_CTRL1);
     data &= ~0x01ff;
@@ -52,24 +57,35 @@ static void adc_init (void)
     data |=  0x0280;
     WRITE_REG (data, ADC_SELECT);
 
+    //enable ADC Interrupt
+    data = READ_REG(ADC_CTRL);
+    data |= AD_PDN_CTRL;
+    WRITE_REG (data, ADC_CTRL);
+
+    //Set GPI01 Flank Detection
     data = READ_REG (SIC2_ATR);
-    data |= 0x400000;
+    data |= GPI01;
     WRITE_REG (data, SIC2_ATR);
 
 	// aanzetten adc en reset
     data = READ_REG(SIC1_ER);
-    data |= 0x40;
+    data |= ADC_INT;
     WRITE_REG (data, SIC1_ER);
 
-    //data = READ_REG();
-    //data |= ;
-    //WRITE_REG (data, );
+    //Enable ADC Interrupt
+    data = READ_REG(ADC_CTRL);
+    data |= AD_PDN_CTRL;
+    WRITE_REG (data, ADC_CTRL);
+
+
+
 
 	//IRQ init
     // if (request_irq (/* TODO */, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
     // {
     //     printk(KERN_ALERT "ADC IRQ request failed\n");
     // }
+
     if (request_irq (IRQ_LPC32XX_GPI_01, gp_interrupt, IRQF_DISABLED, "", NULL) != 0)
     {
         printk (KERN_ALERT "GP IRQ request failed\n");
