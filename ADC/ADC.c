@@ -24,6 +24,13 @@
 #define ADC_READ_MASK       0x1FF
 #define AD_STROBE           1 << 1
 
+#define ADC_RTC             0x1
+#define ADC_PERIPH_CLK      0x01ff
+#define ADC_POS_NEG_REF1    0x03c0
+#define ADC_POS_NEG_REF2    0x0280
+#define ADC_CHANNEL_BIT     0x0030
+
+
 
 #define READ_REG(a)         (*(volatile unsigned int *)(a))
 #define WRITE_REG(b,a)      (*(volatile unsigned int *)(a) = (b))
@@ -39,8 +46,8 @@ static int              adc_values[ADC_NUMCHANNELS] = {0, 0, 0};
 static irqreturn_t      adc_interrupt (int irq, void * dev_id);
 static irqreturn_t      gp_interrupt (int irq, void * dev_id);
 
-// DECLARE_WAIT_QUEUE_HEAD(ADC_Ready_q);
-// static bool ADCIsReady = false;
+DECLARE_WAIT_QUEUE_HEAD(ADC_Ready_q);
+bool ADCIsReady = false;
 
 static void adc_init (void)
 {
@@ -48,18 +55,18 @@ static void adc_init (void)
 
 	// set 32 KHz RTC clock
     data = READ_REG (ADCLK_CTRL);
-    data |= 0x1;
+    data |= ADC_RTC;
     WRITE_REG (data, ADCLK_CTRL);
     
 	// rtc clock ADC & Display = from PERIPH_CLK
     data = READ_REG (ADCLK_CTRL1);
-    data &= ~0x01ff;
+    data &= ~ADC_PERIPH_CLK;
     WRITE_REG (data, ADCLK_CTRL1);
 
 	// negatief & positieve referentie
     data = READ_REG(ADC_SELECT);
-    data &= ~0x03c0;
-    data |=  0x0280;
+    data &= ~ADC_POS_NEG_REF1;
+    data |=  ADC_POS_NEG_REF2;
     WRITE_REG (data, ADC_SELECT);
 
     //Set GPI01 Flank Detection
@@ -76,9 +83,6 @@ static void adc_init (void)
     data = READ_REG(ADC_CTRL);
     data |= AD_PDN_CTRL;
     WRITE_REG (data, ADC_CTRL);
-
-
-
 
 	//IRQ init
     if (request_irq (IRQ_LPC32XX_TS_IRQ, adc_interrupt, IRQF_DISABLED, "", NULL) != 0)
@@ -103,8 +107,9 @@ static void adc_start (unsigned char channel)
     }
 
 	data = READ_REG (ADC_SELECT);
+
 	//selecteer het kanaal, eerst uitlezen, kanaalbits negeren en dan alleen de kanaalbits veranderen (0x0030)
-	WRITE_REG((data & ~0x0030) | ((channel << 4) & 0x0030), ADC_SELECT);
+	WRITE_REG((data & ~ADC_CHANNEL_BIT) | ((channel << 4) & ADC_CHANNEL_BIT), ADC_SELECT);
 
 	//nu ook globaal zetten zodat we de interrupt kunnen herkennen
 	adc_channel = channel;
@@ -113,25 +118,15 @@ static void adc_start (unsigned char channel)
     data = READ_REG(ADC_CTRL);
     data |= AD_STROBE;
     WRITE_REG (data, ADC_CTRL);
-
-    //wait_event_interruptible(ADC_Ready_q,(ADCIsReady == true));
-
 }
 
 static irqreturn_t adc_interrupt (int irq, void * dev_id)
 {
     adc_values[adc_channel] = READ_REG(ADC_VALUE);
     adc_values[adc_channel] &= ADC_READ_MASK;
-    printk(KERN_WARNING "ADC(%d)=%d\n", adc_channel, adc_values[adc_channel]);
 
-    // start the next channel:
-    adc_channel++;
-    if (adc_channel < ADC_NUMCHANNELS)
-    {
-        adc_start (adc_channel);
-    }
-    //ADCIsReady =true;
-    //wake_up_interruptible(&ADC_Ready_q);
+    ADCIsReady =true;
+    wake_up_interruptible(&ADC_Ready_q);
     return (IRQ_HANDLED);
 }
 
@@ -172,10 +167,13 @@ static ssize_t device_read (struct file * file, char __user * buf, size_t length
 
     adc_start (channel);
 
+    ADCIsReady = false;
+    wait_event_interruptible(ADC_Ready_q,(ADCIsReady == true));
+
     // TODO: wait for end-of-conversion,
     // read adc and copy it into 'buf'
 
-    bytesWritten = sprintf(return_buffer, "%d", adc_values[adc_channel]);
+    bytesWritten = sprintf(return_buffer, "%d\n", adc_values[adc_channel]);
 	bytesToWrite = copy_to_user(buf, return_buffer, bytesWritten);
 
     *f_pos = bytesWritten;
@@ -190,8 +188,8 @@ static ssize_t device_read (struct file * file, char __user * buf, size_t length
 static int device_open (struct inode * inode, struct file * file)
 {
     // get channel from 'inode'
-    int channel = 0;
-
+    int minor = MINOR(inode->i_rdev);
+    file->private_data = minor;
 
     try_module_get(THIS_MODULE);
     return 0;
@@ -200,7 +198,7 @@ static int device_open (struct inode * inode, struct file * file)
 
 static int device_release (struct inode * inode, struct file * file)
 {
-    printk (KERN_WARNING DEVICE_NAME ": device_release()\n");
+    //printk (KERN_WARNING DEVICE_NAME ": device_release()\n");
 
 
     module_put(THIS_MODULE);
